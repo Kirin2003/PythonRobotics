@@ -1,4 +1,4 @@
-name: python_robotics
+name: pyrobot
 channels:
   - conda-forge
 dependencies:

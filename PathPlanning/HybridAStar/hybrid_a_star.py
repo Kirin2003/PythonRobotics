@@ -9,6 +9,8 @@ author: Zheng Zh (@Zhengzh)
 import heapq
 import math
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 from scipy.spatial import cKDTree
 import sys
@@ -425,14 +427,31 @@ def main():
     yaw = path.yaw_list
 
     if show_animation:
-        for i_x, i_y, i_yaw in zip(x, y, yaw):
-            plt.cla()
-            plt.plot(ox, oy, ".k")
-            plt.plot(x, y, "-r", label="Hybrid A* path")
+        import time
+        start = time.time()
+        import matplotlib.animation as animation
+        def update_frame(i):
+            plt.cla() # 清除上帧
+            plt.plot(ox, oy, ".k") # 障碍点（静态）
+            plt.plot(x, y, "-r", label="Hybrid A* path") # 整条轨迹（参考）
             plt.grid(True)
             plt.axis("equal")
-            plot_car(i_x, i_y, i_yaw)
-            plt.pause(0.0001)
+            if i < len(x):
+                plot_car(x[i], y[i], yaw[i]) # 在 (ix,iy) 处画车轮廓（带旋转）
+            return []
+        
+        fig = plt.figure()
+        anim = animation.FuncAnimation(
+            fig, 
+            update_frame, 
+            frames=len(x), 
+            interval=100,
+        )
+        
+        anim.save('hybrid_a_star_animation.gif', writer='pillow', fps=10)
+        plt.close(fig)
+        end = time.time()
+        print("animation time:{:.4f} s".format(end-start))
 
     print(__file__ + " done!!")
 
